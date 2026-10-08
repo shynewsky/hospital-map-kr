@@ -296,7 +296,17 @@ def attach_equipment(hospitals, equipment_csv: Path):
     return attached, len(matched_hospitals)
 
 
-def export_data(hospitals, department_catalog, output_dir: Path):
+def export_data(
+    hospitals,
+    department_catalog,
+    output_dir: Path,
+    *,
+    dataset_version: str,
+    hospital_reference_date: str,
+    equipment_reference_date: str,
+    hospital_source_name: str,
+    equipment_source_name: str,
+):
     output_dir.mkdir(parents=True, exist_ok=True)
     regions_dir = output_dir / "regions"
     regions_dir.mkdir(parents=True, exist_ok=True)
@@ -326,8 +336,8 @@ def export_data(hospitals, department_catalog, output_dir: Path):
         bounds[region_code] = region_bounds
         payload = {
             "region": {"code": region_code, "name": region_name},
-            "sourceReferenceDate": "2026-06-30",
-            "equipmentReferenceDate": "2024-12-31",
+            "sourceReferenceDate": hospital_reference_date,
+            "equipmentReferenceDate": equipment_reference_date,
             "hospitals": items,
         }
         target = regions_dir / f"{region_code}.json"
@@ -354,10 +364,10 @@ def export_data(hospitals, department_catalog, output_dir: Path):
 
     manifest = {
         "schemaVersion": "1.0.0",
-        "datasetVersion": "2026-06",
+        "datasetVersion": dataset_version,
         "generatedFrom": {
-            "hospitalData": "HIRA 전국 병의원 및 약국 현황 2026.6",
-            "equipmentData": "HIRA 의료장비 상세 현황 2024.12",
+            "hospitalData": hospital_source_name,
+            "equipmentData": equipment_source_name,
         },
         "totalHospitals": total_exported,
         "regions": region_metadata,
@@ -375,6 +385,15 @@ def main():
     source.add_argument("--hira-dir", type=Path)
     parser.add_argument("--equipment-csv", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument("--dataset-version", default="2026-06")
+    parser.add_argument("--hospital-reference-date", default="2026-06-30")
+    parser.add_argument("--equipment-reference-date", default="2024-12-31")
+    parser.add_argument(
+        "--hospital-source-name", default="HIRA 전국 병의원 및 약국 현황 2026.6"
+    )
+    parser.add_argument(
+        "--equipment-source-name", default="HIRA 의료장비 상세 현황 2024.12"
+    )
     args = parser.parse_args()
 
     def build_from(extraction_root: Path):
@@ -385,7 +404,16 @@ def main():
         department_catalog, department_rows = attach_departments(hospitals, department_path)
         designation_rows = attach_designations(hospitals, designation_path)
         equipment_rows, equipment_hospitals = attach_equipment(hospitals, args.equipment_csv)
-        manifest = export_data(hospitals, department_catalog, args.out)
+        manifest = export_data(
+            hospitals,
+            department_catalog,
+            args.out,
+            dataset_version=args.dataset_version,
+            hospital_reference_date=args.hospital_reference_date,
+            equipment_reference_date=args.equipment_reference_date,
+            hospital_source_name=args.hospital_source_name,
+            equipment_source_name=args.equipment_source_name,
+        )
         return skipped, department_rows, designation_rows, equipment_rows, equipment_hospitals, manifest
 
     if args.hira_dir:
