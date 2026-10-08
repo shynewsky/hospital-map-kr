@@ -42,7 +42,6 @@ REGION_NAMES = {
     "210000": "부산",
     "220000": "인천",
     "230000": "대구",
-    "240000": "광주",
     "250000": "대전",
     "260000": "울산",
     "290000": "세종",
@@ -51,11 +50,16 @@ REGION_NAMES = {
     "330000": "충북",
     "340000": "충남",
     "350000": "전북",
-    "360000": "전남",
+    "360000": "전남광주통합특별시",
     "370000": "경북",
     "380000": "경남",
     "390000": "제주",
 }
+
+# 전남광주통합특별시는 2026-07-01 출범했습니다. 2026-06 HIRA 파일은
+# 대부분의 광주·전남 기관을 360000에 넣었지만 일부 광주 구코드 행을
+# 240000으로 남겼습니다. 현재 지역 탐색에서는 이를 하나로 합칩니다.
+REGION_CODE_MERGES = {"240000": "360000"}
 
 EQUIPMENT_CODE_TO_KEY = {
     "B101": "xray",
@@ -179,7 +183,8 @@ def load_hospitals(basic_path: Path):
         if not ykiho:
             continue
 
-        region_code = code_string(row[positions["시도코드"]], 6)
+        source_region_code = code_string(row[positions["시도코드"]], 6)
+        region_code = REGION_CODE_MERGES.get(source_region_code, source_region_code)
         region_name = REGION_NAMES.get(region_code, text(row[positions["시도코드명"]]))
         hospital = {
             "id": public_id(ykiho),
@@ -203,6 +208,8 @@ def load_hospitals(basic_path: Path):
             "designations": [],
             "_ykiho": ykiho,
         }
+        if source_region_code != region_code:
+            hospital["sourceRegionCode"] = source_region_code
         hospitals[ykiho] = hospital
 
     workbook.close()
