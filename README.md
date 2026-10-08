@@ -53,22 +53,33 @@ python -m http.server 4173
 
 ## 데이터 갱신
 
+### GitHub Actions로 갱신 PR 만들기
+
+저장소의 **Actions → Rebuild HIRA data → Run workflow**에서 공식 HIRA ZIP·CSV의 직접 다운로드 URL, 데이터 버전, 기준일과 출처명을 입력합니다. 워크플로는 원본을 다운로드해 지역 JSON을 다시 만들고 검증한 뒤 변경사항이 있을 때만 PR을 생성합니다. 자동 병합은 하지 않으므로 건수와 지역명을 검토한 후 병합해야 합니다.
+
+### 로컬에서 갱신하기
+
 원본 ZIP과 CSV를 다운로드한 뒤 다음 명령을 실행합니다.
 
 ```bash
 python scripts/build_data.py \
   --hira-zip "전국 병의원 및 약국 현황 2026.6.zip" \
   --equipment-csv "장비 상세현황 2024.12..csv" \
-  --out data
+  --out data \
+  --dataset-version "2026-06" \
+  --hospital-reference-date "2026-06-30" \
+  --equipment-reference-date "2024-12-31" \
+  --hospital-source-name "HIRA 전국 병의원 및 약국 현황 2026.6" \
+  --equipment-source-name "HIRA 의료장비 상세 현황 2024.12"
 
 python scripts/validate_data.py
 ```
 
-필요 패키지는 `openpyxl` 하나입니다. 원본 ZIP과 CSV는 용량과 재배포 관리 때문에 저장소에 포함하지 않습니다.
+필요 패키지는 `openpyxl` 하나입니다. 이미 압축을 푼 경우 `--hira-zip` 대신 `--hira-dir`을 사용할 수 있습니다. 원본 ZIP과 CSV는 용량과 재배포 관리 때문에 저장소에 포함하지 않습니다.
 
 ## 데이터 구조
 
-- `data/manifest.json`: 버전, 총 건수, 시도별 파일과 경계
+- `data/manifest.json`: 버전, 총 건수, 광역지역별 파일과 경계
 - `data/departments.json`: 진료과목 코드 목록
 - `data/regions/{시도코드}.json`: 광역지역별 병원, 진료과목, 전문의 수, 장비 보유 신고
 
