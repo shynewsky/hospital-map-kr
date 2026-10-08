@@ -1,0 +1,215 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "2026-06",
+  "generatedFrom": {
+    "hospitalData": "HIRA 전국 병의원 및 약국 현황 2026.6",
+    "equipmentData": "HIRA 의료장비 상세 현황 2024.12"
+  },
+  "totalHospitals": 44609,
+  "regions": [
+    {
+      "code": "110000",
+      "name": "서울",
+      "count": 11110,
+      "url": "data/regions/110000.json",
+      "bounds": {
+        "south": 37.4346173,
+        "west": 126.7963265,
+        "north": 37.6871033,
+        "east": 127.1762408
+      }
+    },
+    {
+      "code": "210000",
+      "name": "부산",
+      "count": 3085,
+      "url": "data/regions/210000.json",
+      "bounds": {
+        "south": 35.0125654,
+        "west": 128.8164556,
+        "north": 35.3436754,
+        "east": 129.2828128
+      }
+    },
+    {
+      "code": "220000",
+      "name": "인천",
+      "count": 2108,
+      "url": "data/regions/220000.json",
+      "bounds": {
+        "south": 37.0245735,
+        "west": 124.6647194,
+        "north": 37.968009,
+        "east": 126.8142918
+      }
+    },
+    {
+      "code": "230000",
+      "name": "대구",
+      "count": 2322,
+      "url": "data/regions/230000.json",
+      "bounds": {
+        "south": 35.6253299,
+        "west": 128.3820086,
+        "north": 36.3065368,
+        "east": 128.8562232
+      }
+    },
+    {
+      "code": "240000",
+      "name": "광주",
+      "count": 1,
+      "url": "data/regions/240000.json",
+      "bounds": {
+        "south": 35.1503193,
+        "west": 126.914297,
+        "north": 35.1503193,
+        "east": 126.914297
+      }
+    },
+    {
+      "code": "250000",
+      "name": "대전",
+      "count": 1271,
+      "url": "data/regions/250000.json",
+      "bounds": {
+        "south": 36.2099777,
+        "west": 127.2675044,
+        "north": 36.4761804,
+        "east": 127.4924327
+      }
+    },
+    {
+      "code": "260000",
+      "name": "울산",
+      "count": 762,
+      "url": "data/regions/260000.json",
+      "bounds": {
+        "south": 35.3442117,
+        "west": 129.0512236,
+        "north": 35.7125801,
+        "east": 129.4504041
+      }
+    },
+    {
+      "code": "310000",
+      "name": "경기",
+      "count": 9662,
+      "url": "data/regions/310000.json",
+      "bounds": {
+        "south": 36.9168838,
+        "west": 126.3923628,
+        "north": 38.1840785,
+        "east": 127.7807867
+      }
+    },
+    {
+      "code": "320000",
+      "name": "강원",
+      "count": 1160,
+      "url": "data/regions/320000.json",
+      "bounds": {
+        "south": 37.1020126,
+        "west": 127.1644869,
+        "north": 38.5389924,
+        "east": 129.3443189
+      }
+    },
+    {
+      "code": "330000",
+      "name": "충북",
+      "count": 1300,
+      "url": "data/regions/330000.json",
+      "bounds": {
+        "south": 36.0229421,
+        "west": 127.3150682,
+        "north": 37.218393,
+        "east": 128.6113176
+      }
+    },
+    {
+      "code": "340000",
+      "name": "충남",
+      "count": 1694,
+      "url": "data/regions/340000.json",
+      "bounds": {
+        "south": 36.0099785,
+        "west": 126.0777917,
+        "north": 37.051629,
+        "east": 127.5684948
+      }
+    },
+    {
+      "code": "350000",
+      "name": "전북",
+      "count": 1776,
+      "url": "data/regions/350000.json",
+      "bounds": {
+        "south": 35.313638,
+        "west": 125.9799729,
+        "north": 36.1380774,
+        "east": 127.851133
+      }
+    },
+    {
+      "code": "360000",
+      "name": "전남",
+      "count": 2963,
+      "url": "data/regions/360000.json",
+      "bounds": {
+        "south": 33.9856661,
+        "west": 125.1266345,
+        "north": 35.4303049,
+        "east": 127.8054667
+      }
+    },
+    {
+      "code": "370000",
+      "name": "경북",
+      "count": 2068,
+      "url": "data/regions/370000.json",
+      "bounds": {
+        "south": 35.5718542,
+        "west": 127.8277487,
+        "north": 37.541595,
+        "east": 130.9084375
+      }
+    },
+    {
+      "code": "380000",
+      "name": "경남",
+      "count": 2466,
+      "url": "data/regions/380000.json",
+      "bounds": {
+        "south": 34.636495,
+        "west": 127.6243063,
+        "north": 35.871404,
+        "east": 129.1741821
+      }
+    },
+    {
+      "code": "390000",
+      "name": "제주",
+      "count": 599,
+      "url": "data/regions/390000.json",
+      "bounds": {
+        "south": 33.1165218,
+        "west": 126.168425,
+        "north": 33.9605247,
+        "east": 126.9530513
+      }
+    },
+    {
+      "code": "410000",
+      "name": "세종시",
+      "count": 262,
+      "url": "data/regions/410000.json",
+      "bounds": {
+        "south": 36.4262164,
+        "west": 127.1568091,
+        "north": 36.7220122,
+        "east": 127.37092
+      }
+    }
+  ]
+}
