@@ -1,0 +1,12 @@
+# Raw public data is downloaded separately and is not committed
+*.zip
+*.xlsx
+*.csv
+
+# Local tools
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+__pycache__/
+*.pyc

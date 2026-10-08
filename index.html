@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="건강보험심사평가원 공개데이터로 주변 병원을 진료과목, 전문의, 의료장비 보유 신고 기준으로 찾아보세요.">
+  <meta name="theme-color" content="#0b6bcb">
+  <title>병원 필터맵 | 공식 의료기관 정보 탐색</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#results">검색 결과로 건너뛰기</a>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-group">
+        <div class="brand-mark" aria-hidden="true">+</div>
+        <div>
+          <h1>병원 필터맵</h1>
+          <p>공식 의료기관 정보 탐색</p>
+        </div>
+      </div>
+      <button class="info-button" id="open-info" type="button" aria-haspopup="dialog">데이터·이용안내</button>
+    </header>
+
+    <main class="main-layout">
+      <section class="map-panel" aria-label="병원 지도">
+        <div id="map"></div>
+        <div class="map-status" id="map-status" role="status">지도를 준비하고 있습니다.</div>
+        <button class="location-fab" id="location-button" type="button" aria-label="현재 위치로 이동">
+          <span aria-hidden="true">◎</span><span>내 위치</span>
+        </button>
+        <div class="map-legend" aria-label="지도 범례">
+          <span><i class="legend-dot tertiary"></i>상급·종합</span>
+          <span><i class="legend-dot hospital"></i>병원</span>
+          <span><i class="legend-dot clinic"></i>의원·보건기관</span>
+        </div>
+      </section>
+
+      <aside class="search-panel" aria-label="병원 검색과 결과">
+        <div class="search-controls">
+          <div class="search-row">
+            <label class="search-box" for="search-input">
+              <span aria-hidden="true">⌕</span>
+              <input id="search-input" type="search" autocomplete="off" placeholder="병원명이나 주소 검색">
+            </label>
+            <button class="primary-button" id="search-button" type="button">검색</button>
+          </div>
+
+          <div class="region-row">
+            <label for="region-select">지역</label>
+            <select id="region-select" aria-label="시도 선택">
+              <option value="">지역 불러오는 중</option>
+            </select>
+            <span class="source-date" id="source-date"></span>
+          </div>
+
+          <div class="filter-block">
+            <div class="filter-title-row">
+              <h2>의료기관 종별</h2>
+              <button class="text-button" id="reset-filters" type="button">초기화</button>
+            </div>
+            <div class="type-chips" id="type-filters"></div>
+          </div>
+
+          <div class="filter-grid">
+            <label class="field-label" for="department-select">
+              <span>진료과목 등록</span>
+              <select id="department-select">
+                <option value="">전체 진료과목</option>
+              </select>
+            </label>
+            <label class="toggle-card" for="specialist-only">
+              <span>
+                <strong>선택 과목 전문의</strong>
+                <small>1명 이상 신고</small>
+              </span>
+              <input id="specialist-only" type="checkbox" disabled>
+              <i aria-hidden="true"></i>
+            </label>
+          </div>
+
+          <div class="filter-block equipment-filter">
+            <div class="filter-title-row">
+              <h2>장비 보유 신고</h2>
+              <span class="help-text">선택 장비를 모두 보유</span>
+            </div>
+            <div class="equipment-chips" id="equipment-filters">
+              <label><input type="checkbox" value="xray"><span>X-ray</span></label>
+              <label><input type="checkbox" value="ct"><span>CT</span></label>
+              <label><input type="checkbox" value="mri"><span>MRI</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-toolbar">
+          <div>
+            <strong id="result-count">0곳</strong>
+            <span id="result-context">을 찾았습니다</span>
+          </div>
+          <div class="sort-tabs" role="group" aria-label="정렬 방식">
+            <button class="active" data-sort="distance" type="button">거리순</button>
+            <button data-sort="name" type="button">가나다순</button>
+          </div>
+        </div>
+
+        <div class="status-banner" id="status-banner" hidden></div>
+        <div class="hospital-list" id="results" tabindex="-1" aria-live="polite"></div>
+        <div class="list-footer" id="list-footer"></div>
+      </aside>
+    </main>
+  </div>
+
+  <dialog class="info-dialog" id="info-dialog">
+    <form method="dialog">
+      <button class="dialog-close" type="submit" aria-label="닫기">×</button>
+    </form>
+    <div class="dialog-content">
+      <p class="eyebrow">병원 필터맵 안내</p>
+      <h2>공식 신고 정보를 쉽게 찾도록 정리했습니다</h2>
+      <section>
+        <h3>데이터 출처</h3>
+        <p>건강보험심사평가원 「전국 병의원 및 약국 현황 2026.6」과 「의료장비 상세 현황 2024.12」을 사용합니다. 공공누리 출처표시 조건에 따라 출처를 표시합니다.</p>
+        <a href="https://opendata.hira.or.kr/op/opc/selectOpenData.do?sno=11925" target="_blank" rel="noopener noreferrer">심평원 원문 보기</a>
+      </section>
+      <section>
+        <h3>표시 기준</h3>
+        <ul>
+          <li><b>진료과목 등록</b>과 <b>해당 과목 전문의 1명 이상</b>은 서로 다른 정보입니다.</li>
+          <li>장비는 의료기관이 신고한 보유 대수입니다. 현재 검사 가능 여부는 방문 전에 전화로 확인하세요.</li>
+          <li>전문의 수와 장비 수는 의료서비스의 질이나 추천 순위를 뜻하지 않습니다.</li>
+          <li>폐업, 이전, 인력 변동 등이 기준일 이후 발생했을 수 있습니다.</li>
+        </ul>
+      </section>
+      <section class="notice-box">
+        <h3>의료 이용 주의</h3>
+        <p>이 서비스는 의료기관 정보를 탐색하는 도구이며 진단, 치료 권고 또는 응급 안내 서비스가 아닙니다. 응급 상황이면 119에 연락하세요.</p>
+      </section>
+    </div>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
