@@ -56,18 +56,6 @@
       }
     },
     {
-      "code": "240000",
-      "name": "광주",
-      "count": 1,
-      "url": "data/regions/240000.json",
-      "bounds": {
-        "south": 35.1503193,
-        "west": 126.914297,
-        "north": 35.1503193,
-        "east": 126.914297
-      }
-    },
-    {
       "code": "250000",
       "name": "대전",
       "count": 1271,
@@ -153,8 +141,8 @@
     },
     {
       "code": "360000",
-      "name": "전남",
-      "count": 2963,
+      "name": "전남광주통합특별시",
+      "count": 2964,
       "url": "data/regions/360000.json",
       "bounds": {
         "south": 33.9856661,
