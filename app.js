@@ -263,7 +263,6 @@
     const selectedEquipment = [...state.selectedEquipment];
 
     state.filtered = state.hospitals
-      .filter((hospital) => hospital.doctorTotal > 0)
       .filter((hospital) => !officialTypes.size || officialTypes.has(hospital.type))
       .filter((hospital) => {
         if (!query) return true;
