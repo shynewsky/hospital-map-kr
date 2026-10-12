@@ -51,49 +51,43 @@
             <button class="primary-button" id="search-button" type="button">검색</button>
           </div>
 
-          <div class="region-row">
-            <label for="region-select">지역</label>
-            <select id="region-select" aria-label="시도 선택">
-              <option value="">지역 불러오는 중</option>
-            </select>
+          <div class="filter-toolbar">
+            <button class="filter-toggle-button" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filter-panel">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+              <span>필터</span>
+              <b id="active-filter-count" hidden>0</b>
+            </button>
             <span class="source-date" id="source-date"></span>
+            <button class="text-button" id="reset-filters" type="button">초기화</button>
           </div>
 
-          <div class="filter-block">
-            <div class="filter-title-row">
-              <h2>의료기관 종별</h2>
-              <button class="text-button" id="reset-filters" type="button">초기화</button>
-            </div>
-            <div class="type-chips" id="type-filters"></div>
-          </div>
+          <div class="filter-panel" id="filter-panel" hidden>
+            <details class="filter-accordion" open>
+              <summary><span>지역</span><small id="region-summary">선택 필요</small></summary>
+              <div class="filter-checklist" id="region-filters"></div>
+            </details>
 
-          <div class="filter-grid">
-            <label class="field-label" for="department-select">
-              <span>진료과목 등록</span>
-              <select id="department-select">
-                <option value="">전체 진료과목</option>
-              </select>
-            </label>
-            <label class="toggle-card" for="specialist-only">
-              <span>
-                <strong>선택 과목 전문의</strong>
-                <small>1명 이상 신고</small>
-              </span>
-              <input id="specialist-only" type="checkbox" disabled>
-              <i aria-hidden="true"></i>
-            </label>
-          </div>
+            <details class="filter-accordion">
+              <summary><span>기관유형</span><small id="type-summary">전체</small></summary>
+              <div class="filter-checklist" id="type-filters"></div>
+            </details>
 
-          <div class="filter-block equipment-filter">
-            <div class="filter-title-row">
-              <h2>장비 보유 신고</h2>
-              <span class="help-text">선택 장비를 모두 보유</span>
-            </div>
-            <div class="equipment-chips" id="equipment-filters">
-              <label><input type="checkbox" value="xray"><span>X-ray</span></label>
-              <label><input type="checkbox" value="ct"><span>CT</span></label>
-              <label><input type="checkbox" value="mri"><span>MRI</span></label>
-            </div>
+            <details class="filter-accordion">
+              <summary><span>진료과목</span><small id="department-summary">전체</small></summary>
+              <div class="filter-checklist" id="department-filters"></div>
+            </details>
+
+            <details class="filter-accordion">
+              <summary><span>전문의</span><small id="specialist-summary">전체</small></summary>
+              <p class="filter-hint">여러 항목은 하나라도 해당하면 표시합니다. 일반의는 전문의가 없는 등록기관도 포함합니다.</p>
+              <div class="filter-checklist" id="specialist-filters"></div>
+            </details>
+
+            <details class="filter-accordion">
+              <summary><span>보유장비</span><small id="equipment-summary">전체</small></summary>
+              <p class="filter-hint">선택한 장비를 모두 보유 신고한 기관만 표시합니다.</p>
+              <div class="filter-checklist equipment-checklist" id="equipment-filters"></div>
+            </details>
           </div>
         </div>
 
@@ -115,6 +109,13 @@
     </main>
   </div>
 
+  <dialog class="info-dialog hospital-detail-dialog" id="detail-dialog">
+    <form method="dialog">
+      <button class="dialog-close" type="submit" aria-label="병원 정보 닫기">×</button>
+    </form>
+    <div class="dialog-content" id="detail-dialog-content"></div>
+  </dialog>
+
   <dialog class="info-dialog" id="info-dialog">
     <form method="dialog">
       <button class="dialog-close" type="submit" aria-label="닫기">×</button>
@@ -132,7 +133,7 @@
         <ul>
           <li><b>진료과목 등록</b>과 <b>해당 과목 전문의 1명 이상</b>은 서로 다른 정보입니다.</li>
           <li><b>의사 0명</b>은 HIRA 원본의 총의사수 항목이 0인 경우이며, 운영 여부를 뜻하지 않습니다.</li>
-          <li>장비는 의료기관이 신고한 보유 대수입니다. 현재 검사 가능 여부는 방문 전에 전화로 확인하세요.</li>
+          <li>보유장비 필터는 HIRA 공개 장비 대분류 196종을 포함합니다. 신고 대수일 뿐 현재 검사 가능 여부는 방문 전에 전화로 확인하세요.</li>
           <li>전문의 수와 장비 수는 의료서비스의 질이나 추천 순위를 뜻하지 않습니다.</li>
           <li>전남·광주는 2026-07-01 출범한 전남광주통합특별시로 함께 표시합니다.</li>
           <li>폐업, 이전, 인력 변동 등이 기준일 이후 발생했을 수 있습니다.</li>
@@ -147,6 +148,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <script src="app.js?v=20261008-1"></script>
+  <script src="app.js?v=20261008-2"></script>
 </body>
 </html>
