@@ -164,7 +164,8 @@
 
   function renderRegionFilters() {
     if (!state.manifest) return;
-    dom.regionFilters.innerHTML = state.manifest.regions.map((region) => checkboxMarkup(
+    const regions = [...state.manifest.regions].sort((first, second) => first.name.localeCompare(second.name, "ko-KR"));
+    dom.regionFilters.innerHTML = regions.map((region) => checkboxMarkup(
       region.code,
       region.name,
       state.selectedRegions.has(region.code),
@@ -173,15 +174,18 @@
   }
 
   function renderTypeFilters() {
-    dom.typeFilters.innerHTML = TYPE_LABELS.map((type) => checkboxMarkup(
-      type,
-      type,
-      state.selectedTypes.has(type),
-    )).join("");
+    dom.typeFilters.innerHTML = [...TYPE_LABELS]
+      .sort((first, second) => first.localeCompare(second, "ko-KR"))
+      .map((type) => checkboxMarkup(
+        type,
+        type,
+        state.selectedTypes.has(type),
+      )).join("");
   }
 
   function renderDepartmentFilters() {
-    dom.departmentFilters.innerHTML = state.departments.map((department) => checkboxMarkup(
+    const departments = [...state.departments].sort((first, second) => first.name.localeCompare(second.name, "ko-KR"));
+    dom.departmentFilters.innerHTML = departments.map((department) => checkboxMarkup(
       department.code,
       department.name,
       state.selectedDepartments.has(department.code),
@@ -193,32 +197,24 @@
       "general",
       "일반의",
       state.selectedSpecialists.has("general"),
-      "전문의가 없는 등록기관 포함",
     );
-    const specialists = state.departments.map((department) => checkboxMarkup(
-      department.code,
-      department.name,
-      state.selectedSpecialists.has(department.code),
-      "전문의 1명 이상",
-    )).join("");
+    const specialists = [...state.departments]
+      .sort((first, second) => first.name.localeCompare(second.name, "ko-KR"))
+      .map((department) => checkboxMarkup(
+        department.code,
+        `${department.name} 전문의 보유`,
+        state.selectedSpecialists.has(department.code),
+      )).join("");
     dom.specialistFilters.innerHTML = general + specialists;
   }
 
   function renderEquipmentFilters() {
-    const groups = new Map();
-    state.equipmentCatalog.forEach((item) => {
-      if (!groups.has(item.group)) groups.set(item.group, []);
-      groups.get(item.group).push(item);
-    });
-    dom.equipmentFilters.innerHTML = [...groups.entries()].map(([group, items]) => `
-      <div class="checklist-group-title">${escapeHtml(group)}</div>
-      ${items.map((item) => checkboxMarkup(
-        item.code,
-        item.name,
-        state.selectedEquipment.has(item.code),
-        `${item.hospitalCount.toLocaleString("ko-KR")}곳 · ${item.quantity.toLocaleString("ko-KR")}대`,
-      )).join("")}
-    `).join("");
+    const equipment = [...state.equipmentCatalog].sort((first, second) => first.name.localeCompare(second.name, "ko-KR"));
+    dom.equipmentFilters.innerHTML = equipment.map((item) => checkboxMarkup(
+      item.code,
+      item.name,
+      state.selectedEquipment.has(item.code),
+    )).join("");
   }
 
   function selectedNames(selected, catalog, fallback = "전체") {
