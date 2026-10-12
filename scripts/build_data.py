@@ -61,12 +61,6 @@ REGION_NAMES = {
 # 240000으로 남겼습니다. 현재 지역 탐색에서는 이를 하나로 합칩니다.
 REGION_CODE_MERGES = {"240000": "360000"}
 
-EQUIPMENT_CODE_TO_KEY = {
-    "B101": "xray",
-    "B108": "ct",
-    "B301": "mri",
-}
-
 TYPE_ORDER = {
     "상급종합": 1,
     "종합병원": 2,
@@ -78,6 +72,15 @@ TYPE_ORDER = {
     "보건소": 8,
     "보건지소": 9,
     "보건진료소": 10,
+}
+
+EQUIPMENT_GROUP_NAMES = {
+    "A": "검사·내시경 장비",
+    "B": "영상·방사선 장비",
+    "C": "물리·재활치료 장비",
+    "D": "수술·중환자치료 장비",
+    "E": "치과 장비",
+    "F": "한방 장비",
 }
 
 
@@ -204,7 +207,7 @@ def load_hospitals(basic_path: Path):
             "generalDoctorCount": integer(row[positions["의과일반의 인원수"]]),
             "specialistTotal": integer(row[positions["의과전문의 인원수"]]),
             "departments": [],
-            "equipment": {"xray": 0, "ct": 0, "mri": 0},
+            "equipment": {},
             "designations": [],
             "_ykiho": ykiho,
         }
@@ -274,14 +277,18 @@ def attach_designations(hospitals, designation_path: Path):
 def attach_equipment(hospitals, equipment_csv: Path):
     attached = 0
     matched_hospitals = set()
+    equipment_names = {}
+    equipment_hospitals = defaultdict(set)
+    equipment_quantities = defaultdict(int)
     with equipment_csv.open("r", encoding="cp949", errors="replace", newline="") as handle:
         reader = csv.DictReader(handle)
-        required = {"암호화된 요양기호", "장비대분류코드", "장비수"}
+        required = {"암호화된 요양기호", "장비대분류코드", "장비대분류명", "장비수"}
         if not required.issubset(set(reader.fieldnames or [])):
             raise RuntimeError(f"Missing equipment columns. Found: {reader.fieldnames}")
         for row in reader:
-            key = EQUIPMENT_CODE_TO_KEY.get(text(row.get("장비대분류코드")))
-            if key is None:
+            code = text(row.get("장비대분류코드"))
+            name = text(row.get("장비대분류명"))
+            if not code or not name:
                 continue
             ykiho = text(row.get("암호화된 요양기호"))
             hospital = hospitals.get(ykiho)
@@ -290,15 +297,30 @@ def attach_equipment(hospitals, equipment_csv: Path):
             quantity = integer(row.get("장비수"))
             if quantity <= 0:
                 continue
-            hospital["equipment"][key] += quantity
+            equipment_names.setdefault(code, name)
+            hospital["equipment"][code] = hospital["equipment"].get(code, 0) + quantity
+            equipment_hospitals[code].add(ykiho)
+            equipment_quantities[code] += quantity
             attached += 1
             matched_hospitals.add(ykiho)
-    return attached, len(matched_hospitals)
+
+    equipment_catalog = [
+        {
+            "code": code,
+            "name": equipment_names[code],
+            "group": EQUIPMENT_GROUP_NAMES.get(code[:1], "기타 장비"),
+            "hospitalCount": len(equipment_hospitals[code]),
+            "quantity": equipment_quantities[code],
+        }
+        for code in sorted(equipment_names)
+    ]
+    return equipment_catalog, attached, len(matched_hospitals)
 
 
 def export_data(
     hospitals,
     department_catalog,
+    equipment_catalog,
     output_dir: Path,
     *,
     dataset_version: str,
@@ -361,6 +383,10 @@ def export_data(
         json.dumps({"departments": departments}, ensure_ascii=False, separators=(",", ":")),
         encoding="utf-8",
     )
+    (output_dir / "equipment.json").write_text(
+        json.dumps({"equipment": equipment_catalog}, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
 
     manifest = {
         "schemaVersion": "1.0.0",
@@ -403,10 +429,13 @@ def main():
         hospitals, skipped = load_hospitals(basic_path)
         department_catalog, department_rows = attach_departments(hospitals, department_path)
         designation_rows = attach_designations(hospitals, designation_path)
-        equipment_rows, equipment_hospitals = attach_equipment(hospitals, args.equipment_csv)
+        equipment_catalog, equipment_rows, equipment_hospitals = attach_equipment(
+            hospitals, args.equipment_csv
+        )
         manifest = export_data(
             hospitals,
             department_catalog,
+            equipment_catalog,
             args.out,
             dataset_version=args.dataset_version,
             hospital_reference_date=args.hospital_reference_date,

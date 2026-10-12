@@ -18,8 +18,15 @@ def fail(message: str):
 def main():
     manifest_path = DATA / "manifest.json"
     departments_path = DATA / "departments.json"
-    if not manifest_path.exists() or not departments_path.exists():
-        fail("manifest.json or departments.json is missing")
+    equipment_path = DATA / "equipment.json"
+    if not manifest_path.exists() or not departments_path.exists() or not equipment_path.exists():
+        fail("manifest.json, departments.json, or equipment.json is missing")
+
+    equipment_payload = json.loads(equipment_path.read_text(encoding="utf-8"))
+    equipment_catalog = equipment_payload.get("equipment", [])
+    equipment_codes = {item.get("code") for item in equipment_catalog if item.get("code")}
+    if len(equipment_codes) < 100 or len(equipment_codes) != len(equipment_catalog):
+        fail(f"equipment catalog looks incomplete or duplicated: {len(equipment_codes)} codes")
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     regions = manifest.get("regions", [])
@@ -58,9 +65,11 @@ def main():
             for department in hospital.get("departments", []):
                 if department.get("specialists", 0) < 0:
                     fail(f"negative specialist count for {hospital_id}")
-            for quantity in hospital.get("equipment", {}).values():
-                if quantity < 0:
-                    fail(f"negative equipment count for {hospital_id}")
+            for code, quantity in hospital.get("equipment", {}).items():
+                if code not in equipment_codes:
+                    fail(f"unknown equipment code {code} for {hospital_id}")
+                if quantity <= 0:
+                    fail(f"non-positive equipment count for {hospital_id}")
 
     if counted_total != declared_total:
         fail(f"manifest total {declared_total} does not match files {counted_total}")
